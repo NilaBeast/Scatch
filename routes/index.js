@@ -129,28 +129,54 @@ router.get('/addtocart/:productid', isloggedin, async (req, res) => {
     }
 });
 
+// Increase quantity
+// Increase quantity
 router.get('/cart/increase/:productid', isloggedin, async (req, res) => {
-    const user = await userModel.findOne({ email: req.user.email });
+  const user = await userModel.findOne({ email: req.user.email }).populate('cart.product');
+  const item = user.cart.find(i => i.product._id.toString() === req.params.productid);
 
-    const item = user.cart.find(i => i.product.toString() === req.params.productid);
-    if (item) {
-        item.quantity += 1;
-        await user.save();
-    }
-    res.redirect('/cart');
+  if (item) {
+    item.quantity += 1;
+    await user.save();
+
+    const price = Number(item.product.price || 0);
+    const discount = Number(item.product.discount || 0);
+    const platformFee = 20;
+    const totalPrice = (price - discount + platformFee) * item.quantity;
+
+    return res.json({
+      success: true,
+      quantity: item.quantity,
+      totalPrice: totalPrice
+    });
+  }
+
+  res.json({ success: false });
 });
 
+// Decrease quantity
 router.get('/cart/decrease/:productid', isloggedin, async (req, res) => {
-    const user = await userModel.findOne({ email: req.user.email });
+  const user = await userModel.findOne({ email: req.user.email }).populate('cart.product');
+  const item = user.cart.find(i => i.product._id.toString() === req.params.productid);
 
-    const item = user.cart.find(i => i.product.toString() === req.params.productid);
-    if (item) {
-        item.quantity = Math.max(1, item.quantity - 1); // prevent 0
-        await user.save();
-    }
-    res.redirect('/cart');
+  if (item) {
+    item.quantity = Math.max(1, item.quantity - 1);
+    await user.save();
+
+    const price = Number(item.product.price || 0);
+    const discount = Number(item.product.discount || 0);
+    const platformFee = 20;
+    const totalPrice = (price - discount + platformFee) * item.quantity;
+
+    return res.json({
+      success: true,
+      quantity: item.quantity,
+      totalPrice: totalPrice
+    });
+  }
+
+  res.json({ success: false });
 });
-
 
 router.get('/removefromcart/:productId', isloggedin, async (req, res) => {
     try {

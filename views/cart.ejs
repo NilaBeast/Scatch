@@ -18,7 +18,7 @@
 </head>
 
 <body class="font-['helvetica_now_display'] bg-white text-black dark:bg-gray-900 dark:text-white transition-colors duration-300">
-  <nav class="w-full flex flex-wrap justify-between px-5 py-3 items-center">
+  <nav class="w-full flex flex-wrap justify-between px-5 py-3 items-center bg-white dark:bg-gray-800 shadow-md">
     <h3 class="text-xl">Scatch</h3>
     <div class="flex flex-wrap gap-3 items-center mt-2 sm:mt-0">
       <a class="hover:text-blue-400 transition-all duration-300 ease-in-out" href="/shop">Shop</a>
@@ -52,20 +52,22 @@
         <h3 class="text-xl text-[<%= item.textcolor %>] dark:text-white"><%= item.name %></h3>
         <div class="flex items-center gap-2">
           <div class="flex items-center gap-3 px-4 py-2 rounded-full shadow-md bg-white dark:bg-gray-700">
-            <a href="/cart/decrease/<%= item._id %>" class="w-8 h-8 flex items-center justify-center hover:bg-blue-500 text-white bg-gray-500 rounded-full transition">
+            <a href="javascript:void(0);" class="decrease-btn w-8 h-8 flex items-center justify-center hover:bg-blue-500 text-white bg-gray-500 rounded-full transition" data-id="<%= item._id %>">
               <i class="ri-subtract-line text-lg"></i>
             </a>
-            <span class="text-base font-semibold text-gray-800 dark:text-white"><%= entry.quantity %></span>
-            <a href="/cart/increase/<%= item._id %>" class="w-8 h-8 flex items-center justify-center hover:bg-blue-500 text-white bg-gray-500 rounded-full transition">
-              <i class="ri-add-line text-lg"></i>
-            </a>
+            <span id="quantity-<%= item._id %>"><%= entry.quantity %></span>
+            <a href="javascript:void(0);" class="increase-btn w-8 h-8 flex items-center justify-center hover:bg-blue-500 text-white bg-gray-500 rounded-full transition" data-id="<%= item._id %>">
+          <i class="ri-add-line text-lg"></i>
+          </a>
+
           </div>
         </div>
       </div>
       <div class="flex items-center justify-between px-4 py-3 bg-[<%= item.textcolor %>] text-white">
-        <h4 class="text-lg">Net Total</h4>
-        <h2 class="text-lg">₹ <%= entry.total %></h2>
-      </div>
+  <h4 class="text-lg">Net Total</h4>
+  <h2 class="text-lg" id="net-total-<%= item._id %>">₹ <%= entry.total %></h2>
+  
+</div>
     </div>
 
     <!-- Price Breakdown -->
@@ -90,12 +92,13 @@
         </div>
         <div class="w-full h-[1px] bg-black dark:bg-white mt-8"></div>
         <div class="flex justify-between mt-4">
-          <h3 class="text-xl">Total Amount</h3>
-          <h3 class="font-semibold text-xl text-green-600">₹ <%= entry.total %></h3>
-        </div>
+  <h3 class="text-xl">Total Amount</h3>
+  <h3 class="font-semibold text-xl text-green-600" id="total-amount-<%= item._id %>">₹ <%= entry.total %></h3>
+</div>
       </div>
     </div>
   </div>
+  
   <% }) %>
 
   <!-- Dark Mode Script -->
@@ -129,5 +132,35 @@
       setTheme(isDark ? 'light' : 'dark');
     });
   </script>
+  <script>
+  document.querySelectorAll('.increase-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.id;
+      const res = await fetch(`/cart/increase/${id}`);
+      const data = await res.json();
+      if (data.success) {
+        const roundedTotal = Math.round(data.totalPrice);
+        document.getElementById(`quantity-${id}`).textContent = data.quantity;
+        document.getElementById(`net-total-${id}`).textContent = `₹ ${roundedTotal}`;
+        document.getElementById(`total-amount-${id}`).textContent = `₹ ${roundedTotal}`;
+      }
+    });
+  });
+
+  document.querySelectorAll('.decrease-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.id;
+      const res = await fetch(`/cart/decrease/${id}`);
+      const data = await res.json();
+      if (data.success) {
+        const roundedTotal = Math.round(data.totalPrice);
+        document.getElementById(`quantity-${id}`).textContent = data.quantity;
+        document.getElementById(`net-total-${id}`).textContent = `₹ ${roundedTotal}`;
+        document.getElementById(`total-amount-${id}`).textContent = `₹ ${roundedTotal}`;
+      }
+    });
+  });
+</script>
+
 </body>
 </html>
