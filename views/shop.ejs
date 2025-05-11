@@ -1,88 +1,135 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shop</title>
+
+  <!-- Tailwind dark mode config -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class'
+    };
+  </script>
+
+  <!-- Remix Icon -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
 </head>
-<body class="font-['helvitica_now_display']">
-    <nav class="w-full flex justify-between px-5 py-3">
-        <h3 class="text-xl">Scatch</h3>
-        <% var loggedin = typeof loggedin !== "undefined" ? loggedin : true %>
-        <% if(loggedin){ %>
 
-            <div class="flex gap-5">
-                <a  class="hover:text-blue-400 hover:transition-all hover:duration-300 hover:ease-in-out " href="">Shop</a>
-                <a class="hover:text-blue-400 hover:transition-all hover:duration-300 hover:ease-in-out " href="/cart">Cart</a>
-                <a class="hover:text-blue-400 hover:transition-all hover:duration-300 hover:ease-in-out " href="/profile">My Account</a>
-                <a class="text-red-600 hover:text-blue-400  hover:transition-all hover:duration-300 hover:ease-in-out" href="/users/logout">Logout</a>
-            </div>
+<body class="font-['helvitica_now_display'] bg-white text-black dark:bg-gray-900 dark:text-white transition-colors duration-300">
+  <!-- Navbar -->
+  <nav class="w-full flex justify-between px-4 py-3 items-center bg-white dark:bg-gray-800 shadow-md">
+    <h3 class="text-xl font-bold">Scatch</h3>
 
+    <% var loggedin = typeof loggedin !== "undefined" ? loggedin : true %>
+    <% if (loggedin) { %>
+    <div class="flex flex-wrap gap-4 items-center">
+      <a class="hover:text-blue-400 transition" href="">Shop</a>
+      <a class="hover:text-blue-400 transition" href="/cart">Cart</a>
+      <a class="hover:text-blue-400 transition" href="/profile">My Account</a>
+      <a class="text-red-600 hover:text-blue-400 transition" href="/users/logout">Logout</a>
 
-       <% } %>
-    </nav>
-
-    <% if(success.length>0){ %>
-        <div class="absolute top-5 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 rounded-md bg-blue-500">
-            <span class="inline-block mt-1 mb-1 text-white">
-                <%= success %>
-            </span>
-        </div>
-        <% } %>
-
-    <div class="w-full h-screen flex items-start px-20 py-20">
-        <div class="w-[25%] flex h-screen flex-col items-start">
-            <div class="flex items-center gap-2">
-                <h3>sort by</h3>
-                <form action="/shop" method="GET">
-                    <select class="border-[1px] px-2 py-1" name="sortby" onchange="this.form.submit()">
-                        <option value="popular" <%= sortby === 'popular' ? 'selected' : '' %>>Popular</option>
-                        <option value="newest" <%= sortby === 'newest' ? 'selected' : '' %>>Newest</option>
-                    </select>
-                </form>
-                
-            </div>
-            <div class="flex flex-col mt-20">
-                <a class="block w-fit mb-2" href="/shop?filter=new">New Collection</a>
-                <a class="block w-fit mb-2" href="/shop">All Products</a>
-                <a class="block w-fit mb-2" href="/shop?filter=discount">Discounted Products</a>
-            </div>
-            
-            <div class="mt-32">
-                <span class="block w-fit mb-2 font-semibold">Filter by :</span>
-                <a class="block w-fit mb-2" href="/shop?sortby=priceAsc">Price low - high</a>
-                <a class="block w-fit mb-2" href="/shop?sortby=priceDesc">Price high - low</a>
-            </div>
-            
-        </div>
-        <div class="w-[75%] flex flex-col gap-5 h-screen">
-            <div class="flex items-start gap-5">
-                <% products.forEach(function(product){ %>
-                    <div class="w-60">
-                        <div class="w-full h-52 flex items-center justify-center bg-[<%= product.bgcolor %>]">
-                            <img class="h-[10rem]" src="data:image/jpeg;base64,<%= product.image.toString('base64') %>"
-                                alt="">
-                        </div>
-                        <div
-                            class="flex justify-between bg-[<%= product.panelcolor %>] items-center px-4 py-4 text-[<%= product.textcolor %>]">
-                            <div>
-                                <h3>
-                                    <%= product.name %>
-                                </h3>
-                                <h4>₹ <%= product.price %>
-                                </h4>
-                            </div>
-                            <a class="w-7 h-7 flex items-center justify-center rounded-full bg-white" href="/addtocart/<%= product.id %>">
-                                <i class="ri-add-line"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <% }) %>
-            </div>
-        </div>
+      <!-- Dark Mode Toggle -->
+      <button id="theme-toggle" class="text-xl">
+        <i id="theme-icon" class="ri-moon-line"></i>
+      </button>
     </div>
+    <% } %>
+  </nav>
 
+  <!-- Success Message -->
+  <% if (success.length > 0) { %>
+  <div class="fixed top-5 left-1/2 transform -translate-x-1/2 p-3 rounded-md bg-blue-500 dark:bg-blue-700 text-white z-50 shadow-lg">
+    <%= success %>
+  </div>
+  <% } %>
+
+  <!-- Main Content -->
+  <div class="w-full flex flex-col lg:flex-row px-4 sm:px-6 lg:px-20 py-8 gap-6">
+    <!-- Sidebar -->
+    <aside class="w-full lg:w-1/4 space-y-8">
+      <div>
+        <h3 class="font-semibold mb-2">Sort by</h3>
+        <form action="/shop" method="GET">
+          <select class="w-full border px-3 py-2 bg-white dark:bg-gray-700 dark:text-white rounded" name="sortby" onchange="this.form.submit()">
+            <option value="popular" <%= sortby === 'popular' ? 'selected' : '' %>>Popular</option>
+            <option value="newest" <%= sortby === 'newest' ? 'selected' : '' %>>Newest</option>
+          </select>
+        </form>
+      </div>
+
+      <div>
+        <h4 class="font-semibold mb-2">Categories</h4>
+        <nav class="space-y-2">
+          <a class="block hover:text-blue-400" href="/shop?filter=new">New Collection</a>
+          <a class="block hover:text-blue-400" href="/shop">All Products</a>
+          <a class="block hover:text-blue-400" href="/shop?filter=discount">Discounted Products</a>
+        </nav>
+      </div>
+
+      <div>
+        <h4 class="font-semibold mb-2">Filter by Price</h4>
+        <nav class="space-y-2">
+          <a class="block hover:text-blue-400" href="/shop?sortby=priceAsc">Price low - high</a>
+          <a class="block hover:text-blue-400" href="/shop?sortby=priceDesc">Price high - low</a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Products Section -->
+    <section class="w-full lg:w-3/4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+        <% products.forEach(function(product) { %>
+        <div class="w-full bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow hover:shadow-lg transition">
+          <div class="w-full h-52 flex items-center justify-center bg-[<%= product.bgcolor %>]">
+            <img class="h-40 object-contain" src="data:image/jpeg;base64,<%= product.image.toString('base64') %>" alt="<%= product.name %>">
+          </div>
+          <div class="flex justify-between items-center px-4 py-4 text-[<%= product.textcolor %>] dark:text-white bg-[<%= product.panelcolor %>] dark:bg-gray-800">
+            <div>
+              <h3 class="font-semibold"><%= product.name %></h3>
+              <h4>₹ <%= product.price %></h4>
+            </div>
+            <a class="w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600" href="/addtocart/<%= product.id %>">
+              <i class="ri-add-line"></i>
+            </a>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+    </section>
+  </div>
+
+  <!-- Dark Mode Script -->
+  <script>
+    const toggleBtn = document.getElementById('theme-toggle');
+    const icon = document.getElementById('theme-icon');
+
+    function setTheme(theme) {
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+        icon.className = "ri-sun-line";
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        icon.className = "ri-moon-line";
+        localStorage.setItem('theme', 'light');
+      }
+    }
+
+    const storedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (storedTheme) {
+      setTheme(storedTheme);
+    } else if (prefersDark) {
+      setTheme('dark');
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setTheme(isDark ? 'light' : 'dark');
+    });
+  </script>
 </body>
 </html>
